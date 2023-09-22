@@ -1,0 +1,139 @@
+using System;
+using System.Collections.Generic;
+
+public class Dinglemouse
+{
+    public static int[] DryGround(char[][] terrain)
+    {
+      // At the start, we establish the terrain heights.
+      int[][] heightValues = new int[terrain.Length][];
+      for(int i = 0; i < terrain.Length; i++)
+      {
+        int[] rowValues = new int[terrain[i].Length];
+        heightValues[i] = rowValues;
+      }
+      
+      for(int i = 0; i < terrain.Length; i++)
+      {
+        for(int j = 0; j < terrain[i].Length; j++)
+        {
+          if(terrain[i][j] == '^')
+          {
+            heightValues[i][j] = 1;
+          }
+          else if(terrain[i][j] == '-')
+          {
+            heightValues[i][j] = -1;
+          }
+        }
+      }
+      
+      bool higherMountain;
+      do
+      {
+        higherMountain = false;
+        for(int i = 1; i < heightValues.Length-1; i++)
+        {
+          for(int j = 1; j < heightValues[i].Length-1; j++)
+          {
+            if(heightValues[i][j] <= 0)
+            {
+              continue;
+            }
+            int cVal = heightValues[i][j];
+            if(cVal <= heightValues[i-1][j] && cVal <= heightValues[i+1][j] && cVal <= heightValues[i][j-1] && cVal <= heightValues[i][j+1])
+            {
+              heightValues[i][j]++;
+              higherMountain = true;
+            }
+          }
+        }
+      }
+      while(higherMountain);
+      
+      // Now that the mountain heights are set up, the logic for landing is next.
+      // The rule here is that if a tile is above the height threshold, or if all tiles around this tile are not flooded, then this tile is okay to land on.
+      int waterHeight = 0;
+      int day1 = 0;
+      bool[][] isFlooded = new bool[terrain.Length][];
+      for(int i = 0; i < terrain.Length; i++)
+      {
+        bool[] rowFlooded = new bool[terrain[i].Length];
+        for(int j = 0; j < terrain[i].Length; j++)
+        {
+          if(terrain[i][j] == '-')
+          {
+            rowFlooded[j] = true;
+          }
+          else
+          {
+            day1++;
+          }
+        }
+        isFlooded[i] = rowFlooded;
+      }
+      
+      int[] res = new int[] {day1, 0, 0, 0};
+      
+      for(int day = 1; day < 4; day++)
+      {
+        bool hasChanged;
+        int landableTiles = 0;
+        waterHeight++;
+        do
+        {
+          hasChanged = false;
+          for(int i = 0; i < terrain.Length; i++)
+          {
+            for(int j = 0; j < terrain[i].Length; j++)
+            {
+              if(heightValues[i][j] >= waterHeight)
+              {
+                continue;
+              }
+              if(isFlooded[i][j])
+              {
+                continue;
+              }
+              if(i > 0 && isFlooded[i-1][j])
+              {
+                isFlooded[i][j] = true;
+                hasChanged = true;
+              }
+              else if(i < isFlooded.Length-1 && isFlooded[i+1][j])
+              {
+                isFlooded[i][j] = true;
+                hasChanged = true;
+              }
+              else if(j > 0 && isFlooded[i][j-1])
+              {
+                isFlooded[i][j] = true;
+                hasChanged = true;
+              }
+              else if(j < isFlooded[i].Length-1 && isFlooded[i][j+1])
+              {
+                isFlooded[i][j] = true;
+                hasChanged = true;
+              }
+            }
+          }
+        }
+        while(hasChanged);
+        
+        for(int i = 0; i < isFlooded.Length; i++)
+        {
+          for(int j = 0; j < isFlooded[i].Length; j++)
+          {
+            if(!isFlooded[i][j])
+            {
+              landableTiles++;
+            }
+          }
+        }
+        res[day] = landableTiles;
+        
+      }
+      
+      return res;
+    }
+}
