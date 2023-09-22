@@ -1,0 +1,154 @@
+using System.Collections.Generic;
+using System;
+
+public enum Result 
+{ 
+    Win, 
+    Loss, 
+    Tie 
+}
+
+public class PokerHand
+{
+  public string[] handType = {"High Card", "Pair", "2Pair", "3Kind", "Straight", "Flush", "House", "4Kind", "StraightFlush"};
+  public string[] cardRanks = {"2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"};
+  public string[] handRanks = new string[5];
+  public List<int> integerHandRanks = new List<int>();
+  public string thisHand;
+  public PokerHand(string hand)
+  {
+    bool isFlush = true;
+    bool isStraight = false;
+    //bool isSame = false;
+    string[] handCards = hand.Split(" ");
+    char suit = handCards[0][1];
+    int maxSize = 0;
+    Dictionary<char, int> pairVals = new Dictionary<char, int>();
+    for(int i = 0; i < handCards.Length; i++)
+    {
+      if(handCards[i][1] != suit)
+        isFlush = false;
+      if(!pairVals.ContainsKey(handCards[i][0]))
+      {
+        pairVals.Add(handCards[i][0], 1);
+      }
+      else
+      {
+        pairVals[handCards[i][0]]++;
+        maxSize = pairVals[handCards[i][0]];
+      }
+      handRanks[i] = Convert.ToString(handCards[i][0]);
+    }
+    if(pairVals.Count == 5)
+    {
+      int[] ids = new int[5];
+      int maxId = Array.IndexOf(cardRanks, handRanks[0]);
+      int minId = Array.IndexOf(cardRanks, handRanks[0]);
+      for(int i = 0; i < 5; i++)
+      {
+        int curId = Array.IndexOf(cardRanks, handRanks[i]);
+        if(curId > maxId)
+          maxId = curId;
+        if(curId < minId)
+          minId = curId;
+        ids[i] = curId;
+      }
+      if(maxId - minId == 4)
+      {
+        isStraight = true;
+        integerHandRanks.Add(maxId);
+      }
+      else
+      {
+        for(int i = 0; i < 5; i++)
+        {
+          integerHandRanks.Add(ids[i]);
+        }
+        integerHandRanks.Sort();
+        integerHandRanks.Reverse();
+        for(int i = 0; i < 5; i++)
+        {
+          Console.WriteLine(integerHandRanks[i]);
+        }
+      }
+    }
+    else
+    {
+      for(int i = 4; i >= 1; i--)
+      {
+        List<int> eachVal = new List<int>();
+        foreach(KeyValuePair<char, int> K in pairVals)
+        {
+          if(K.Value == i)
+          {
+            eachVal.Add(Array.IndexOf(cardRanks, Convert.ToString(K.Key)));
+          }
+        }
+        eachVal.Sort();
+        eachVal.Reverse();
+        for(int j = 0; j < eachVal.Count; j++)
+        {
+          integerHandRanks.Add(eachVal[j]);
+        }
+      }
+    }
+    
+    if(isStraight && isFlush)
+    {
+      thisHand = handType[8];
+    }
+    else if(isStraight)
+    {
+      thisHand = handType[4];
+    }
+    else if(isFlush)
+    {
+      thisHand = handType[5];
+    }
+    else if(maxSize == 4)
+    {
+      thisHand = handType[7];
+    }
+    else if(maxSize == 3 && pairVals.Count == 2)
+    {
+      thisHand = handType[6];  
+    }
+    else if(maxSize == 3)
+    {
+      thisHand = handType[3];
+    }
+    else if(maxSize == 2 && pairVals.Count == 3)
+    {
+      thisHand = handType[2];
+    }
+    else if(maxSize == 2)
+    {
+      thisHand = handType[1];
+    }
+    else
+    {
+      thisHand = handType[0];
+    }
+    Console.WriteLine(thisHand);
+  }
+
+  public Result CompareWith(PokerHand hand)
+  {
+    if(Array.IndexOf(handType, thisHand) < Array.IndexOf(hand.handType, hand.thisHand))
+    {
+      return Result.Loss;
+    }
+    else if(Array.IndexOf(handType, thisHand) > Array.IndexOf(hand.handType, hand.thisHand))
+    {
+      return Result.Win;
+    }
+    for(int i = 0; i < integerHandRanks.Count; i++)
+    {
+      if(integerHandRanks[i] > hand.integerHandRanks[i])
+        return Result.Win;
+      else if(integerHandRanks[i] < hand.integerHandRanks[i])
+        return Result.Loss;
+    }
+    return Result.Tie;
+  }
+}
