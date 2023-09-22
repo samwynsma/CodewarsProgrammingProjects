@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+
+public class Kata {
+
+  public static string GenerateBC(string url, string separator)
+  {
+    Console.WriteLine(url);
+    string[] wordsToIgnore = new string[] {"THE", "OF", "IN", "FROM", "BY", "WITH", "AND", "OR", "FOR", "TO", "AT", "A"};
+    string[] itemSet = url.Split("/");
+    List<string> resSet = new List<string>();
+    bool startingSignature = true;
+    int index = 0;
+    string prevPart = "";
+    string reference = "";
+    for(int i = 0; i < itemSet.Length; i++)
+    {
+      string breadcrumbPart = "";
+      //Console.WriteLine(itemSet[i]);
+      if(startingSignature)
+      {
+        string[] lineSplit = itemSet[i].Split(".");
+        if(lineSplit.Length > 1)
+        {
+          startingSignature = false;
+        }
+        else
+        {
+          continue;
+        }
+      }
+      if(index == 0)
+      {
+        breadcrumbPart = "HOME";
+      }
+      else
+      {
+        string removeEnd = "";
+        for(int j = 0; j < itemSet[i].Length; j++)
+        {
+          if(!"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-".Contains(itemSet[i][j])) // If there are any invalid characters, they should be ignored from the breadcrumb.
+          {
+            break;
+          }
+          removeEnd += itemSet[i][j];
+        }
+        string[] thisSplit = removeEnd.Split("-");
+        for(int j = 0; j < thisSplit.Length; j++)
+        {
+          thisSplit[j] = thisSplit[j].ToUpper();
+        }
+        if(removeEnd.Length <= 30) // If the length is less than 30, just capitalize
+        {
+          breadcrumbPart = string.Join(" ", thisSplit);
+        }
+        else // Otherwise, only take the capital first letters.
+        {
+          for(int j = 0; j < thisSplit.Length; j++)
+          {
+            if(Array.IndexOf(wordsToIgnore, thisSplit[j]) == -1)
+              breadcrumbPart += thisSplit[j][0];
+          }
+        }
+      }
+      if(i == itemSet.Length - 1) // Final round
+      {
+        string[] lastSplit = itemSet[i].Split(".");
+        if(lastSplit[0].Equals("index") || itemSet[i].Length == 0 || !"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".Contains(itemSet[i][0])) // Ignore indexes and special character strings at the end.
+        {
+          resSet[resSet.Count-1] = "<span class=\"active\">" + prevPart + "</span>";
+        }
+        else
+        {
+          resSet.Add("<span class=\"active\">" + breadcrumbPart + "</span>");
+        }
+      }
+      else if(index > 0) // Add an "a" for anything that is not at the end.
+      {
+        reference += itemSet[i] + "/";
+        resSet.Add("<a href=\"/" + reference + "\">" + breadcrumbPart + "</a>");
+      }
+      else
+      {
+        resSet.Add("<a href=\"/\">HOME</a>"); // The first element is always the same if there are multiple elements.
+      }
+      index++;
+      prevPart = breadcrumbPart;
+    }
+    return string.Join(separator, resSet);
+  }
+}
