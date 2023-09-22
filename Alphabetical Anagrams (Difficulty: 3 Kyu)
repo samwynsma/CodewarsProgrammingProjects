@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+
+public class Kata
+{
+    public static long ListPosition(string value)
+    {
+      // This problem combines string manipulation with factorials.
+      // However, we must keep track of repeating characters.
+      // As such, a dictionary is necessary for my plan.
+      // Hashmap in Java would work too. I create a new dictionary each time I go through.
+      // And I add up all reoccurances to dictionary, then I divide those duplicates from the factorial.
+      long possibleVals = 1;
+      int earlierVals = 0;
+      for(int i = 0; i < value.Length-1; i++)
+      {
+        Dictionary<char, int> myDict = new Dictionary<char, int>();
+        myDict.Add(value[i], 1);
+        for(int j = i+1; j < value.Length; j++)
+        {
+          if(value[i] > value[j])
+            earlierVals++;
+          if(myDict.ContainsKey(value[j]))
+          {
+            myDict[value[j]]++;
+          }
+          else
+          {
+            myDict.Add(value[j], 1);
+          }
+        }
+        long addedValue = earlierVals*fact(value.Length-i-1);
+        foreach(int item in myDict.Values)
+        {
+          addedValue /= fact(item);
+        }
+        possibleVals += addedValue;
+        earlierVals = 0;
+      }
+      return possibleVals;
+    }
+  
+  public static long fact(int a)
+  {
+    if(a == 0)
+      return 1;
+    if(a == 1)
+      return 1;
+    return a * fact(a-1);
+  }
+}
