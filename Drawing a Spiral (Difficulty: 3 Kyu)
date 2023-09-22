@@ -1,0 +1,64 @@
+using System;
+
+public class Spiralizor
+{
+    public static int[,] Spiralize(int size)
+    {
+      int[,] outSpiral = new int[size,size];
+      int xRight = size-1;
+      int xLeft = 0;
+      int yUp = 0;
+      int yDown = size-1;
+      int direction = 0;
+      int curX = 0;
+      int curY = 0;
+      
+      while(yUp <= yDown || xLeft <= xRight)
+      {
+        if(direction == 0)
+        {
+          yUp += 2;
+          while(curX < xRight)
+          {
+            outSpiral[curY,curX] = 1;
+            curX++;
+          }
+          direction = 1;
+        }
+        else if(direction == 1)
+        {
+          xRight -= 2;
+          while(curY < yDown)
+          {
+            outSpiral[curY, curX] = 1;
+            curY++;
+          }
+          direction = 2;
+        }
+        else if(direction == 2)
+        {
+          yDown -= 2;
+          while(curX > xLeft)
+          {
+            outSpiral[curY, curX] = 1;
+            curX--;
+          }
+          direction = 3;
+        }
+        else
+        {
+          xLeft += 2;
+          while(curY > yUp)
+          {
+            outSpiral[curY, curX] = 1;
+            curY--;
+          }
+          direction = 0;
+        }
+      }
+      
+      outSpiral[curY,curX] = 1; // Add the last one, on the last iteration.
+      
+      return outSpiral;
+    }
+}
