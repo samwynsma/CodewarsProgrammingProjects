@@ -1,0 +1,167 @@
+using System;
+using System.Collections.Generic;
+
+public class ConnectFour
+    {
+        public static string WhoIsWinner(List<string> piecesPositionList)
+        {
+          // I'm going to use integers to resemble states in my grid.
+          // 0 = no tile, 1 = red, 2 = yellow.
+          int[,] myInts = new int[7,6];
+          int[] rowVals = new int[7];
+          for(int x = 0; x < 7; x++)
+          {
+            for(int y = 0; y < 6; y++)
+            {
+              myInts[x,y] = 0;
+            }
+            rowVals[x] = 0;
+          }
+          
+          for(int i = 0; i < piecesPositionList.Count; i++)
+          {
+            string[] moveStr = piecesPositionList[i].Split("_");
+            int placeVal;
+            if(moveStr[1] == "Red")
+              placeVal = 1;
+            else
+              placeVal = 2;
+            int columnValue = moveStr[0][0] - 65;
+            myInts[columnValue,rowVals[columnValue]] = placeVal;
+            string winner = checkWinner(myInts, columnValue, rowVals[columnValue]);
+            //Console.WriteLine(winner);
+            if(winner == "Red")
+              return "Red";
+            if(winner == "Yellow")
+              return "Yellow";
+            rowVals[columnValue]++;
+          }
+          for(int y = 5; y >= 0; y--)
+          {
+            for(int x = 0; x < 7; x++)
+            {
+              Console.Write(myInts[x,y]);
+            }
+            Console.Write("\n");
+          }
+          
+          return "Draw";
+          
+        }
+  
+      public static string checkWinner(int[,] intsList, int x, int y)
+      {
+        int numInRow = 1;
+        int numInCol = 1;
+        int numInDiag = 1;
+        // Horizontal Win Condition Test.
+        for(int i = x+1; i < 7; i++)
+        {
+          if(intsList[i, y] == intsList[x, y])
+            numInRow++;
+          else
+            break;
+        }
+        for(int i = x-1; i >= 0; i--)
+        {
+          if(intsList[i, y] == intsList[x, y])
+            numInRow++;
+          else
+            break;
+        }
+        if(numInRow >= 4)
+        {
+          if(intsList[x, y] == 1)
+            return "Red";
+          else
+            return "Yellow";
+        }
+        
+        // Vertical Win Condition Test
+        for(int i = y+1; i < 6; i++)
+        {
+          if(intsList[x, i] == intsList[x, y])
+            numInCol++;
+          else
+            break;
+        }
+        for(int i = y-1; i >= 0; i--)
+        {
+          if(intsList[x, i] == intsList[x, y])
+            numInCol++;
+          else
+            break;
+        }
+        if(numInCol >= 4)
+        {
+          if(intsList[x, y] == 1)
+            return "Red";
+          else
+            return "Yellow";
+        }
+        
+        // Diagonal Win Condition Test, forward diagonal
+        int xch = x+1;
+        int ych = y+1;
+        while(xch < 7 && ych < 6)
+        {
+          if(intsList[xch, ych] == intsList[x, y])
+            numInDiag++;
+          else
+            break;
+          xch++;
+          ych++;
+        }
+        xch = x-1;
+        ych = y-1;
+        while(xch >= 0 && ych >= 0)
+        {
+          if(intsList[xch, ych] == intsList[x, y])
+            numInDiag++;
+          else
+            break;
+          xch--;
+          ych--;
+        }
+        if(numInDiag >= 4)
+        {
+          if(intsList[x, y] == 1)
+            return "Red";
+          else
+            return "Yellow";
+        }
+        
+        // Diagonal Win Condition, backward diagonal
+        numInDiag = 1;
+        xch = x+1;
+        ych = y-1;
+        while(xch < 7 && ych >= 0)
+        {
+          if(intsList[xch, ych] == intsList[x, y])
+            numInDiag++;
+          else
+            break;
+          xch++;
+          ych--;
+        }
+        xch = x-1;
+        ych = y+1;
+        while(xch >= 0 && ych < 6)
+        {
+          if(intsList[xch, ych] == intsList[x, y])
+            numInDiag++;
+          else
+            break;
+          xch--;
+          ych++;
+        }
+        if(numInDiag >= 4)
+        {
+          if(intsList[x, y] == 1)
+            return "Red";
+          else
+            return "Yellow";
+        }
+        return "No Winner Yet";
+      }
+}
