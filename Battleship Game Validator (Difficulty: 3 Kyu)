@@ -1,0 +1,124 @@
+namespace Solution {
+  using System;
+  using System.Collections.Generic;
+  public class BattleshipField {
+    public static bool ValidateBattlefield(int[,] field) {
+      // Use a bool array to check if a position has already been used.
+      bool[,] tileChecked = new bool[10,10];
+      for(int i = 0; i < 10; i++)
+      {
+        for(int j = 0; j < 10; j++)
+        {
+          tileChecked[i, j] = false;
+        }
+      }
+      // The number of each ship left. If these numbers all end up at zero, return true.
+      int subs = 4;
+      int dest = 3;
+      int cruise = 2;
+      int battleship = 1;
+      
+      
+      for(int x = 0; x < 10; x++)
+      {
+        int length = 0;
+        for(int y = 0; y < 10; y++)
+        {
+          if(tileChecked[x, y])
+          {
+            if(field[x,y] == 1)
+            {
+              if(x+1 < 10)
+              { // return false if there's an illegal horizontal tile.
+                if(field[x+1, y] == 1 && tileChecked[x+1, y] == false)
+                  return false;
+              }
+              if(y+1 < 10)
+              { // return false if there's an illegal vertical tile.
+                if(field[x,y+1] == 1 && tileChecked[x,y+1] == false)
+                  return false;
+              }
+            }
+            continue;
+          }
+          if(field[x, y] == 0)
+          {
+            tileChecked[x,y] = true;
+            continue;
+          }
+          else
+          {
+            length = 1;
+            tileChecked[x,y] = true;
+            int q = x+1;
+            int r = y+1;
+            bool horizCheck = false;
+            while(q < 10)
+            {
+              if(field[q, y] == 0)
+                break;
+              length += 1;
+              horizCheck = true;
+              tileChecked[q,y] = true;
+              q++;
+            }
+            while(r < 10)
+            {
+              if(field[x,r] == 0)
+                break;
+              if(horizCheck == true) // A tile cannot have both a vertically and horizontally adjacent tile
+                return false;
+              length += 1;
+              tileChecked[x,r] = true;
+              r++;
+            }
+            
+            // Check length of ship. If the ship is longer than 4, its not a legal ship.
+            switch(length)
+            {
+                case 0: break;
+                case 1: subs--; break;
+                case 2: dest--; break;
+                case 3: cruise--; break;
+                case 4: battleship--; break;
+                default: return false;
+            }
+          }
+          
+          // Return false if there's an illegal diagonal ship
+          if(x+1 < 10)
+          {
+            if(y+1 < 10)
+            {
+              if(field[x+1,y+1] == 1)
+                return false;
+            }
+            if(y-1 > 0)
+            {
+              if(field[x+1,y-1] == 1)
+                return false;
+            }
+          }
+          if(x-1 > 0)
+          {
+            if(y+1 < 10)
+            {
+              if(field[x-1,y+1] == 1)
+                return false;
+            }
+            if(y-1 > 0)
+            {
+              if(field[x-1,y-1] == 1)
+                return false;
+            }
+          }
+          
+        }
+      }
+      
+      if(subs == 0 && dest == 0 && cruise == 0 && battleship == 0)
+        return true;
+      return false;
+    }
+  }
+}
