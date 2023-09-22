@@ -1,0 +1,105 @@
+using System;
+public class RailFenceCipher
+{
+  public static string Encode(string s, int n)
+  {
+    // Encoding is reasonably simple. Take string, iterate down and up the rails, separating into lists.
+    // Then concatenate the lists together.
+    if(s == "")
+      return "";
+    string encodedStr = "";
+    int railNum = 0;
+    string[] encodedLists = new string[n];
+    bool downRail = true;
+    for(int i = 0; i < s.Length; i++)
+    {
+      encodedLists[railNum] += s[i];
+      if(railNum == 0)
+      {
+        downRail = true;
+      }
+      if(railNum == n-1)
+      {
+        downRail = false;
+      }
+      if(downRail)
+      {
+        railNum++;
+      }
+      else
+      {
+        railNum--;
+      }
+    }
+    
+    for(int i = 0; i < encodedLists.Length; i++)
+    {
+      encodedStr += encodedLists[i];
+    }
+    
+    return encodedStr;
+  }
+
+  public static string Decode(string s, int n)
+  {
+    // Decoding, on the other hand, is why this problem is a 3kyu problem.
+    if(s == "")
+      return "";
+    string decodedStr = "";
+    int railNum = 0;
+    bool downRail = true;
+    string[] decodedLists = new string[n];
+    int cycle = (n * 2) - 2; // Each cycle is an up and down the rail. The top and bottom occur once, every other one occurs twice. This means we double and subtract 2.
+    int width = s.Length / cycle; // How many full cycles there are.
+    int[] decodedSizes = new int[n];
+    for(int i = 0; i < n; i++)
+    {
+      if(i == 0 || i == (n-1))
+        decodedSizes[i] = width;
+      else
+        decodedSizes[i] = width * 2;
+    }
+    int val = s.Length % cycle; // How much of a partial cycle there is left over.
+    for(int i = 0; i < val; i++)
+    {
+      decodedSizes[railNum]++; // Add partial cycle elements.
+      if(railNum == n-1)
+      {
+        downRail = false;
+      }
+      if(downRail)
+      {
+        railNum++;
+      }
+      else
+        railNum--;
+    }
+    
+    int index = 0;
+    for(int i = 0; i < n; i++)
+    {
+      decodedLists[i] += s.Substring(index, decodedSizes[i]); // Lists to go through next.
+      index += decodedSizes[i];
+      decodedSizes[i] = 0;
+    }
+    
+    railNum = 0;
+    downRail = true;
+    for(int i = 0; i < s.Length; i++) // This is where the actual decoding happens. The loop is similar to the encoding loop, but in the opposite direction.
+    {
+      decodedStr += decodedLists[railNum][decodedSizes[railNum]];
+      decodedSizes[railNum]++;
+      if(railNum == 0)
+        downRail = true;
+      if(railNum == n-1)
+        downRail = false;
+      if(downRail)
+        railNum++;
+      else
+        railNum--;
+    }
+    
+    
+    return decodedStr;
+  }
+}
