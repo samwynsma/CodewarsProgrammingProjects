@@ -1,0 +1,36 @@
+def runoff(voters):
+    winner = ""
+    elimList = []
+    voteCounts = {}
+    declaredWinner = False
+    voteLists = []
+    for cand in voters[0]:
+        voteCounts[cand] = 0
+    while(not declaredWinner):
+        for item in voteCounts:
+            voteCounts[item] = 0
+        if(len(voters[0]) == 0):
+            return None
+        for item in voters:
+            voteCounts[item[0]] += 1
+        minVal = -1
+        elimList = []
+        for item in voteCounts:
+            if(voteCounts[item] > (0.5 * len(voters))):
+                return item
+            if(minVal == -1):
+                minVal = voteCounts[item]
+                elimList.append(item)
+            elif(voteCounts[item] == minVal):
+                elimList.append(item)
+            elif(voteCounts[item] < minVal):
+                minVal = voteCounts[item]
+                elimList = []
+                elimList.append(item)
+        for item in elimList:
+            for vote in voters:
+                if(item in vote):
+                    vote.remove(item)
+            if(item in voteCounts):
+                voteCounts.pop(item)
+    return winner
