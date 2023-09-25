@@ -1,0 +1,91 @@
+import java.util.*;
+
+class Warrior {
+  
+  private int wLevel;
+  private int wExperience;
+  private ArrayList<String> ach;
+  public Warrior()
+  {
+    wLevel = 1;
+    wExperience = 100;
+    ach = new ArrayList<String>();
+  }
+  
+  public int level()
+  {
+    return wLevel;
+  }
+  
+  public int experience()
+  {
+    return wExperience;
+  }
+  
+  public String rank()
+  {
+    String[] ranks = {"Pushover", "Novice", "Fighter", "Warrior", "Veteran", "Sage", "Elite", "Conqueror", "Champion", "Master", "Greatest"};
+    int rVal = wLevel / 10;
+    return ranks[rVal];
+  }
+  
+  public ArrayList<String> achievements()
+  {
+    return ach;
+  }
+  
+  public String training(String Desc, int exp, int minL)
+  {
+    if(minL > wLevel)
+    {
+      return "Not strong enough";
+    }
+    wExperience += exp;
+    ach.add(Desc);
+    adjustLevel();
+    return Desc;
+  }
+  
+  public String battle(int enLevel)
+  {
+    boolean intense = false;
+    if(enLevel < 1 || enLevel > 100)
+      return "Invalid level";
+    if((enLevel / 10) > (wLevel / 10))
+    {
+      if(enLevel >= (wLevel + 5))
+        return "You've been defeated";
+    }
+    if(wLevel >= enLevel + 2)
+    {
+      return "Easy fight";
+    }
+    if(wLevel == enLevel + 1)
+    {
+      wExperience += 5;
+    }
+    if(wLevel == enLevel)
+    {
+      wExperience += 10;
+    }
+    if(wLevel < enLevel)
+    {
+      int diff = enLevel - wLevel;
+      wExperience += (20 * diff * diff);
+      intense = true;
+    }
+    
+    adjustLevel();
+    if(intense)
+      return "An intense fight";
+    return "A good fight";
+    
+  }
+  
+  private void adjustLevel() // Reduce redundancies with level adjustment.
+  {
+    if(wExperience > 10000)
+      wExperience = 10000;
+    wLevel = wExperience / 100;
+  }
+}
