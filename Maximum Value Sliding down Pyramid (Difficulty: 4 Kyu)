@@ -1,0 +1,41 @@
+using System;
+using System.Collections.Generic;
+
+public class PyramidSlideDown
+{
+  public static int LongestSlideDown(int[][] pyramid)
+  {
+    // Linear solution.
+    // This algorithm has an efficiency equivalent to the number of elements in the pyramid, or O(n) where n is the number of elements in the pyramid.
+    List<int[]> pyramidList = new List<int[]>();
+    int maxVal = 0;
+    int[] firstElem = new int[1];
+    firstElem[0] = pyramid[0][0];
+    pyramidList.Add(firstElem);
+    for(int i = 1; i < pyramid.Length; i++)
+    {
+      int[] row = new int[pyramid[i].Length];
+      for(int j = 0; j < row.Length; j++)
+      {
+        int left = 0;
+        int right = 0;
+        if(j > 0)
+        {
+          left = pyramid[i][j] + pyramidList[i-1][j-1]; // Previous row, left element
+        }
+        if(j < row.Length - 1)
+        {
+          right = pyramid[i][j] + pyramidList[i-1][j]; // Previous row, right element
+        }
+        if(left > right)
+          row[j] = left;
+        else
+          row[j] = right;
+        if(row[j] > maxVal)
+          maxVal = row[j]; // Maximizer
+      }
+      pyramidList.Add(row);
+    }
+    return maxVal;
+  }
+}
